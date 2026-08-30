@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="PEI Avalia Docente: gerador de códigos, análise e avaliação dos projetos em trio.">
+<title>PEI Avalia Docente V4.2</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="docente.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><div class="brand"><img src="assets/senai_logo.webp" alt="SENAI"><div><strong>PEI Avalia Docente V4.2</strong><small>Gerador de códigos • análise técnica • nota do trio</small></div></div><div class="top-actions"><button class="btn" id="themeBtn">Tema</button><a class="btn" href="index.html">Plataforma do trio</a><button class="btn danger" id="resetTeacher">Resetar dados locais</button></div></div></header>
+<main class="teacher-shell">
+<section class="hero teacher-hero"><div class="hero-kicker">Ambiente exclusivo do docente</div><h1>Da geração do código à nota fundamentada do trio</h1><p>Gere os códigos das equipes, importe o arquivo de entrega produzido pelo trio, confira evidências por critério, ajuste a pontuação quando necessário e emita um relatório de avaliação indicando exatamente o que foi atingido e o que precisa ser melhorado.</p><div class="hero-metrics"><div class="hero-stat"><strong id="codesCount">0</strong><span>Códigos gerados</span></div><div class="hero-stat"><strong id="projectsCount">0</strong><span>Trios avaliados</span></div><div class="hero-stat"><strong id="currentScore">—</strong><span>Nota atual</span></div><div class="hero-stat"><strong id="currentCompletion">—</strong><span>Conclusão técnica</span></div></div></section>
+
+<div class="teacher-tabs no-print"><button class="active" data-tab="codes">1. Gerador de códigos</button><button data-tab="assessment">2. Avaliação do trio</button><button data-tab="history">3. Histórico</button></div>
+
+<section class="teacher-tab active" id="tab-codes">
+  <div class="section"><div class="section-head"><div><h2>Gerador de códigos para os trios</h2><p>Um código deve ser entregue para cada empresa/equipe. O mesmo código sempre gera a mesma situação-problema na plataforma do aluno.</p></div></div>
+  <div class="grid4"><div class="field"><label>Ano</label><input id="codeYear" type="number" value="2026"></div><div class="field"><label>Turma / identificação</label><input id="codeClass" placeholder="Ex.: ELETRO-A"></div><div class="field"><label>Quantidade de trios</label><input id="codeQty" type="number" min="1" max="50" value="10"></div><div class="field"><label>Iniciar no trio</label><input id="codeStart" type="number" min="1" value="1"></div></div>
+  <div class="actions-row"><button class="btn primary" id="generateCodes">Gerar códigos</button><button class="btn" id="exportCodesCsv">Exportar CSV</button><button class="btn danger" id="clearCodes">Resetar códigos</button></div>
+  <div class="callout"><strong>Padrão:</strong> <code>PEI-ANO-TURMA-T01</code>. Se o campo Turma ficar vazio, será usado <code>PEI-ANO-T01</code>.</div>
+  <div class="table-wrap"><table class="teacher-table"><thead><tr><th>#</th><th>Código</th><th>Empresa / Trio</th><th>Integrantes</th><th>Status</th></tr></thead><tbody id="codesBody"><tr><td colspan="5">Nenhum código gerado.</td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section class="teacher-tab" id="tab-assessment">
+  <div class="section"><div class="section-head"><div><h2>Importar e analisar projeto do trio</h2><p>Importe o arquivo <strong>ENTREGA_...json</strong> gerado pela plataforma do trio.</p></div><label class="btn primary file-btn">Importar entrega JSON<input id="importSubmission" type="file" accept=".json,application/json"></label></div><div id="emptyAssessment" class="callout orange"><strong>Aguardando projeto.</strong> Importe o JSON de entrega do trio para iniciar a análise.</div><div id="projectOverview" class="hidden"></div></div>
+  <div id="assessmentWorkspace" class="hidden">
+    <div class="section"><div class="section-head"><div><h2>Rubrica de avaliação — 100 pontos</h2><p>A plataforma sugere a pontuação a partir das evidências registradas. O docente pode homologar ou ajustar cada critério.</p></div><button class="btn" id="useSuggested">Usar todas as notas sugeridas</button></div><div id="rubricList" class="rubric-list"></div></div>
+    <div class="section"><h2>Parecer final do docente</h2><div class="grid2"><div class="field"><label>Pontos fortes do trio</label><textarea id="teacherStrengths" placeholder="Registre as competências demonstradas..."></textarea></div><div class="field"><label>Pontos a melhorar</label><textarea id="teacherImprove" placeholder="Registre correções e oportunidades de melhoria..."></textarea></div></div><div class="field"><label>Observação final</label><textarea id="teacherFinalNote" placeholder="Parecer conclusivo sobre o projeto e a participação do trio..."></textarea></div></div>
+    <div class="section score-panel"><div><small>NOTA DO TRIO</small><strong id="score100">0,0 / 100</strong><span id="score10">0,0 / 10,0</span></div><div><small>CRITÉRIOS ATINGIDOS</small><strong id="criteriaAchieved">0 / 12</strong><span id="gradeConcept">Aguardando avaliação</span></div><div class="score-actions no-print"><button class="btn primary" id="generateGrade">Gerar / atualizar nota</button><button class="btn green" id="pdfAssessment">Gerar relatório PDF</button><button class="btn" id="exportAssessment">Exportar avaliação JSON</button></div></div>
+    <div class="section"><h2>Resumo dos critérios</h2><div id="criteriaSummary"></div></div>
+  </div>
+</section>
+
+<section class="teacher-tab" id="tab-history"><div class="section"><div class="section-head"><div><h2>Histórico de avaliações</h2><p>As avaliações ficam salvas neste navegador e podem ser reabertas.</p></div></div><div id="historyList" class="history-grid"></div></div></section>
+
+<section id="assessmentReport" class="report-root hidden"></section>
+</main>
+<script src="docente.js"></script>
+</body></html>
